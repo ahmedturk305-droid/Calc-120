@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>حاسبة × 120</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f766e">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#eef2f1; --surface:#ffffff; --ink:#14302b; --muted:#5d7a74; --accent:#0f766e; --line:#c9d8d5;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#0f1c1a; --surface:#172a27; --ink:#e6f2ef; --muted:#8fb0a9; --accent:#4fd1c1; --line:#2c4742;}
+}
+:root[data-theme="dark"]{--bg:#0f1c1a; --surface:#172a27; --ink:#e6f2ef; --muted:#8fb0a9; --accent:#4fd1c1; --line:#2c4742;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,"Noto Sans Arabic",Arial,sans-serif;padding:20px}
+.card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px}
+label{display:block;font-size:15px;color:var(--muted);margin-bottom:8px}
+input{width:100%;font-size:32px;padding:14px 16px;border:2px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);text-align:center;font-family:inherit;direction:ltr}
+input:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.out{margin-top:22px;text-align:center}
+.out small{display:block;color:var(--muted);font-size:15px;margin-bottom:6px}
+#res{font-size:46px;font-weight:700;color:var(--accent);direction:ltr;word-break:break-all;min-height:56px}
+button{margin-top:18px;width:100%;padding:12px;font-size:16px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--ink);font-family:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent)}
+</style>
+</head>
+<body>
+<main class="card">
+  <label for="n">اكتب الرقم</label>
+  <input id="n" type="text" inputmode="decimal" autocomplete="off" placeholder="0" autofocus>
+  <div class="out">
+    <small>الناتج × 120</small>
+    <div id="res">0</div>
+  </div>
+  <button id="copy" type="button">نسخ الناتج</button>
+</main>
+<script>
+const n=document.getElementById('n'),res=document.getElementById('res'),copy=document.getElementById('copy');
+const map={'٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9','٫':'.','،':'.',',':'.'};
+function calc(){
+  const raw=n.value.replace(/[٠-٩٫،,]/g,c=>map[c]).replace(/[^0-9.\-]/g,'');
+  const v=parseFloat(raw);
+  if(isNaN(v)){res.textContent='0';return}
+  const r=Math.round(v*120*1e6)/1e6;
+  res.textContent=r.toLocaleString('en-US',{maximumFractionDigits:6});
+}
+n.addEventListener('input',calc);
+copy.addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(res.textContent.replace(/,/g,''));copy.textContent='تم النسخ';}
+  catch(e){copy.textContent='النسخ غير متاح هنا';}
+  setTimeout(()=>copy.textContent='نسخ الناتج',1500);
+});
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+</script>
+</body>
+</html>
